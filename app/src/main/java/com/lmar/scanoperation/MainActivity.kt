@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,6 +20,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -37,6 +41,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,6 +51,7 @@ import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.lmar.scanoperation.core.util.Expression
 import com.lmar.scanoperation.ui.composable.CustomTextField
+import com.lmar.scanoperation.ui.composable.IconCard
 import com.lmar.scanoperation.ui.theme.ScanOperationTheme
 import java.io.File
 import java.io.IOException
@@ -54,15 +60,18 @@ import java.util.Date
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
+    companion object {
+        const val TAG = "MainActivity"
+    }
 
     private var photoPath: String? = null
     private lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var takePictureLauncher: ActivityResultLauncher<Uri>
 
-    private var reconigzerText by mutableStateOf("10+4(40-15)")
+    private var reconigzerText by mutableStateOf("")
     private var imageBitmap by mutableStateOf<ImageBitmap?>(null)
 
-    private var resultExpression by mutableStateOf("")
+    private var resultExpression by mutableStateOf("0")
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,20 +162,31 @@ class MainActivity : ComponentActivity() {
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Scan Operation App",
-                    style = TextStyle(
-                        fontSize = 36.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                SelectionContainer(
+                    modifier = Modifier
+                        .padding(top = 16.dp, bottom = 16.dp)
+                ) {
+                    Text(
+                        text = "Escanear Operaciones Matemáticas",
+                        textAlign = TextAlign.Center,
+                        style = TextStyle(
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     )
+                }
+
+                IconCard(
+                    icon = Icons.Default.Notifications,
+                    description = "Apunta la cámara a una expresión matemática para escanear o puedes ingresar una expresión y presionar en \"Calcular\" para mostrar el resultado."
                 )
 
                 if(imageBitmap == null) {
                     Image(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp),
+                            .height(240.dp),
                         painter = painterResource(id = R.drawable.image_24),
                         contentDescription = "Imagen por defecto"
                     )
@@ -174,21 +194,30 @@ class MainActivity : ComponentActivity() {
                     imageBitmap?.let {
                         Image(
                             modifier = Modifier
-                                .height(200.dp),
+                                .height(240.dp),
                             painter = BitmapPainter(it),
                             contentDescription = "Imagen capturada"
                         )
                     }
                 }
 
+                IconCard(
+                    icon = Icons.Default.Check,
+                    title = "Ejemplos",
+                    description = "4+6 || 3+5(2-8) || (4-2)(6-3x7+8/2)"
+                )
+
                 SelectionContainer(
-                    modifier = Modifier.padding(top = 16.dp, bottom = 16.dp)
+                    modifier = Modifier
+                        .padding(top = 16.dp, bottom = 16.dp)
                 ) {
-                    CustomTextField(value = reconigzerText, label = "Operación", onValueChange = { reconigzerText = it })
+                    CustomTextField(value = reconigzerText, label = "Expresión", onValueChange = { reconigzerText = it })
                 }
 
                 Button(
-                    onClick = {}
+                    onClick = {
+                        processExpression(reconigzerText)
+                    }
                 ) {
                     Text(text = "Calcular")
                 }
@@ -212,13 +241,19 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun processExpression(expression: String) {
-        val isValid = Expression.isValidExpression(expression)
+        if(expression.isEmpty()) return
+        Log.d(TAG, "Expresion Inicial: $expression")
+        val exp = Expression.addAsteriskBetweenDigitsAndParentheses(expression)
+        Log.d(TAG, "Expresion Final: $exp")
+        val isValid = Expression.isValidExpression(exp)
         resultExpression = if(isValid) {
-            Expression.evaluateExpression(expression).toString()
+            Expression.evaluateExpression(exp).toString()
         } else {
+            Log.d(TAG, "¡Expresion no válida!")
             Toast.makeText(this, "¡Expresión no válida!", Toast.LENGTH_SHORT).show()
             "0"
         }
+        Log.e(TAG, "Resultado: $resultExpression")
     }
 }
 

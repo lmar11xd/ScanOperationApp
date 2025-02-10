@@ -1,6 +1,18 @@
 package com.lmar.scanoperation.ui.composable
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -10,10 +22,17 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.lmar.scanoperation.ui.theme.ScanOperationTheme
 
 private val AppTextInputIconSize = 16.dp
 
@@ -53,7 +72,9 @@ fun CustomTextField(
     trailingIcon: Painter? = null,
 ) {
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(start = 8.dp, end = 8.dp),
         colors = AppTextInputColors,
         value = value,
         onValueChange = onValueChange,
@@ -88,5 +109,63 @@ fun CustomTextField(
 @Composable
 fun CustomTextFieldPreview() {
     CustomTextField(value = "Valor del campo", label = "Nombre del campo", onValueChange = {})
+}
+
+@Composable
+fun IconCard(
+    icon: ImageVector,
+    description: String,
+    modifier: Modifier = Modifier,
+    title: String? = null
+) {
+    Card(
+        shape = RoundedCornerShape(12.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(10.dp)
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(32.dp)
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column {
+                if (!title.isNullOrEmpty()) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontSize = 10.sp
+                    )
+                }
+                Text(
+                    text = description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 10.sp,
+                    lineHeight = TextUnit(12F, TextUnitType.Sp)
+                )
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun IconCardPreview() {
+    ScanOperationTheme {
+        IconCard(
+            icon = Icons.Default.Notifications,
+            title = "Información",
+            description = "Este es un ejemplo de una tarjeta con icono."
+        )
+    }
 }
 
