@@ -13,12 +13,14 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -35,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -52,6 +55,7 @@ import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.lmar.scanoperation.core.util.Expression
 import com.lmar.scanoperation.ui.composable.CustomTextField
 import com.lmar.scanoperation.ui.composable.IconCard
+import com.lmar.scanoperation.ui.composable.RoundedText
 import com.lmar.scanoperation.ui.theme.ScanOperationTheme
 import java.io.File
 import java.io.IOException
@@ -71,7 +75,7 @@ class MainActivity : ComponentActivity() {
     private var reconigzerText by mutableStateOf("")
     private var imageBitmap by mutableStateOf<ImageBitmap?>(null)
 
-    private var resultExpression by mutableStateOf("0")
+    private var resultExpression by mutableStateOf("0.0")
 
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -186,7 +190,10 @@ class MainActivity : ComponentActivity() {
                     Image(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(240.dp),
+                            .height(240.dp)
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(MaterialTheme.colorScheme.primaryContainer),
                         painter = painterResource(id = R.drawable.image_24),
                         contentDescription = "Imagen por defecto"
                     )
@@ -194,7 +201,10 @@ class MainActivity : ComponentActivity() {
                     imageBitmap?.let {
                         Image(
                             modifier = Modifier
-                                .height(240.dp),
+                                .height(240.dp)
+                                .padding(8.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer),
                             painter = BitmapPainter(it),
                             contentDescription = "Imagen capturada"
                         )
@@ -225,7 +235,7 @@ class MainActivity : ComponentActivity() {
                 SelectionContainer(
                     modifier = Modifier.padding(top = 16.dp)
                 ) {
-                    CustomTextField(value = resultExpression, label = "Resultado", onValueChange = { resultExpression = it })
+                    RoundedText(text = resultExpression)
                 }
 
             }
@@ -251,7 +261,7 @@ class MainActivity : ComponentActivity() {
         } else {
             Log.d(TAG, "¡Expresion no válida!")
             Toast.makeText(this, "¡Expresión no válida!", Toast.LENGTH_SHORT).show()
-            "0"
+            "0.0"
         }
         Log.e(TAG, "Resultado: $resultExpression")
     }

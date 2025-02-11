@@ -1,9 +1,13 @@
 package com.lmar.scanoperation.ui.composable
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +31,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -66,6 +72,7 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
+    enabled: Boolean = true,
     // icons param
     leadingIcon: Painter? = null,
     onTrailingIconClick: () -> Unit = {},
@@ -78,6 +85,7 @@ fun CustomTextField(
         colors = AppTextInputColors,
         value = value,
         onValueChange = onValueChange,
+        enabled = enabled,
         label = {
             Text(text = label)
         },
@@ -169,3 +177,41 @@ fun IconCardPreview() {
     }
 }
 
+@Composable
+fun RoundedText(
+    text: String,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = Color.Transparent, //MaterialTheme.colorScheme.primaryContainer
+    textColor: Color = MaterialTheme.colorScheme.primary,
+    borderColor: Color = MaterialTheme.colorScheme.primary,
+    borderWidth: Dp = 2.dp,
+    cornerRadius: Dp = 4.dp,
+    padding: Dp = 16.dp
+) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 8.dp, end = 8.dp)
+    ) {
+        Box(
+            modifier = modifier
+                .fillMaxWidth()
+                .border(borderWidth, borderColor, RoundedCornerShape(cornerRadius))
+                .background(backgroundColor, shape = RoundedCornerShape(cornerRadius))
+                .padding(padding)
+        ) {
+            Text(
+                text = text,
+                color = textColor,
+                fontSize = 16.sp
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RoundedTextPreview() {
+    ScanOperationTheme {
+        RoundedText(text = "Hola, Jetpack Compose!")
+    }
+}
